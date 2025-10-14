@@ -1,5 +1,5 @@
 //
-//  ComposerView.swift
+//  CreateView.swift
 //  Antar
 //
 //  Created by Lagani Patel on 10/13/25.
@@ -7,13 +7,28 @@
 
 import SwiftUI
 
-struct ComposerView: View {
+enum ContentType: String, CaseIterable {
+    case post = "Post"
+    case reel = "Reel"
+    case story = "Story"
+    
+    var icon: String {
+        switch self {
+        case .post: return "square.and.pencil"
+        case .reel: return "video.fill"
+        case .story: return "circle.grid.3x3.fill"
+        }
+    }
+}
+
+struct CreateView: View {
     @EnvironmentObject var mockDataService: MockDataService
+    @State private var selectedContentType: ContentType = .post
     @State private var caption = ""
     @State private var scheduledDate = Date()
     @State private var isScheduled = false
     @State private var showingDatePicker = false
-    @Environment(\.dismiss) var dismiss
+    @State private var notepadText = ""
     
     private let characterLimit = 2200
     
@@ -21,11 +36,17 @@ struct ComposerView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Content Type Selection
+                    ContentTypeSelector(selectedType: $selectedContentType)
+                    
                     // Media Placeholder
-                    MediaPlaceholderView()
+                    MediaPlaceholderView(contentType: selectedContentType)
                     
                     // Caption Section
                     CaptionSectionView(caption: $caption, characterLimit: characterLimit)
+                    
+                    // Notepad Section
+                    NotepadSectionView(notepadText: $notepadText)
                     
                     // Scheduling Section
                     SchedulingSectionView(
@@ -39,18 +60,35 @@ struct ComposerView: View {
                         caption: caption,
                         isScheduled: isScheduled,
                         scheduledDate: scheduledDate,
-                        mockDataService: mockDataService,
-                        dismiss: dismiss
+                        contentType: selectedContentType,
+                        mockDataService: mockDataService
                     )
                 }
                 .padding()
             }
-            .navigationTitle("Create Post")
+            .navigationTitle("Create")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+        }
+    }
+}
+
+struct ContentTypeSelector: View {
+    @Binding var selectedType: ContentType
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Content Type")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            HStack(spacing: 12) {
+                ForEach(ContentType.allCases, id: \.self) { type in
+                    ContentTypeCard(
+                        type: type,
+                        isSelected: selectedType == type
+                    )
+                    .onTapGesture {
+                        selectedType = type
                     }
                 }
             }
@@ -58,14 +96,64 @@ struct ComposerView: View {
     }
 }
 
+struct ContentTypeCard: View {
+    let type: ContentType
+    let isSelected: Bool
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: type.icon)
+                .font(.system(size: 28))
+                .foregroundColor(isSelected ? .white : .blue)
+            
+            Text(type.rawValue)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(isSelected ? .white : .primary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+        )
+    }
+}
+
 struct MediaPlaceholderView: View {
+    let contentType: ContentType
+    
+    var placeholderText: String {
+        switch contentType {
+        case .post:
+            return "Tap to add photos or videos"
+        case .reel:
+            return "Tap to add a video for your reel"
+        case .story:
+            return "Tap to add photo or video for your story"
+        }
+    }
+    
+    var placeholderIcon: String {
+        switch contentType {
+        case .post:
+            return "photo.on.rectangle.angled"
+        case .reel:
+            return "video.badge.plus"
+        case .story:
+            return "photo.stack"
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "photo.on.rectangle.angled")
+            Image(systemName: placeholderIcon)
                 .font(.system(size: 50))
                 .foregroundColor(.secondary.opacity(0.5))
             
-            Text("Tap to add photos or videos")
+            Text(placeholderText)
                 .font(.callout)
                 .foregroundColor(.secondary)
         }
@@ -131,6 +219,51 @@ struct CaptionSectionView: View {
         ]
         
         caption = aiCaptions.randomElement() ?? aiCaptions[0]
+    }
+}
+
+struct NotepadSectionView: View {
+    @Binding var notepadText: String
+    @State private var isExpanded = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button(action: { isExpanded.toggle() }) {
+                HStack {
+                    Image(systemName: "note.text")
+                        .foregroundColor(.blue)
+                    Text("Notepad")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                }
+            }
+            
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Keep extra notes and draft ideas here")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    TextEditor(text: $notepadText)
+                        .frame(minHeight: 80)
+                        .padding(8)
+                        .background(Color(.tertiarySystemBackground))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(.separator), lineWidth: 1)
+                        )
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }
 
@@ -210,14 +343,18 @@ struct ActionButtonsView: View {
     let caption: String
     let isScheduled: Bool
     let scheduledDate: Date
+    let contentType: ContentType
     let mockDataService: MockDataService
-    let dismiss: DismissAction
+    
+    var scheduleButtonText: String {
+        "Schedule \(contentType.rawValue)"
+    }
     
     var body: some View {
         VStack(spacing: 12) {
             if isScheduled {
                 Button(action: { schedulePost() }) {
-                    Text("Schedule Post")
+                    Text(scheduleButtonText)
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -253,7 +390,6 @@ struct ActionButtonsView: View {
             accountId: mockDataService.activeAccount?.id ?? UUID()
         )
         mockDataService.posts.append(post)
-        dismiss()
     }
     
     private func saveAsDraft() {
@@ -263,11 +399,11 @@ struct ActionButtonsView: View {
             accountId: mockDataService.activeAccount?.id ?? UUID()
         )
         mockDataService.posts.append(post)
-        dismiss()
     }
 }
 
 #Preview {
-    ComposerView()
+    CreateView()
         .environmentObject(MockDataService.shared)
 }
+

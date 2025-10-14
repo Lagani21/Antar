@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var mockDataService: MockDataService
-    @State private var showingComposer = false
     @State private var selectedTab = 0
     
     var body: some View {
@@ -26,16 +25,11 @@ struct MainTabView: View {
                 }
                 .tag(1)
             
-            Button(action: { showingComposer = true }) {
-                Text("Create")
-            }
-            .tabItem {
-                Label("Create", systemImage: "plus.circle.fill")
-            }
-            .tag(2)
-            .sheet(isPresented: $showingComposer) {
-                ComposerView()
-            }
+            CreateView()
+                .tabItem {
+                    Label("Create", systemImage: "plus.circle.fill")
+                }
+                .tag(2)
             
             DraftsView()
                 .tabItem {
