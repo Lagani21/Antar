@@ -40,6 +40,11 @@ struct MockPost: Identifiable, Codable {
     var accountId: UUID
     var createdAt: Date
     var updatedAt: Date
+    var contentType: ContentType = .post
+    // Time-series engagement (used for analytics)
+    var weekSeries: [EngagementPoint] = []
+    var monthSeries: [EngagementPoint] = []
+    var yearSeries: [EngagementPoint] = []
     
     init(
         id: UUID = UUID(),
@@ -55,7 +60,11 @@ struct MockPost: Identifiable, Codable {
         impressions: Int = 0,
         accountId: UUID,
         createdAt: Date = Date(),
-        updatedAt: Date = Date()
+        updatedAt: Date = Date(),
+        contentType: ContentType = .post,
+        weekSeries: [EngagementPoint] = [],
+        monthSeries: [EngagementPoint] = [],
+        yearSeries: [EngagementPoint] = []
     ) {
         self.id = id
         self.caption = caption
@@ -71,6 +80,10 @@ struct MockPost: Identifiable, Codable {
         self.accountId = accountId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.contentType = contentType
+        self.weekSeries = weekSeries
+        self.monthSeries = monthSeries
+        self.yearSeries = yearSeries
     }
     
     var engagementRate: Double {
@@ -78,4 +91,12 @@ struct MockPost: Identifiable, Codable {
         let totalEngagement = likesCount + commentsCount + sharesCount
         return (Double(totalEngagement) / Double(reach)) * 100
     }
+}
+
+struct EngagementPoint: Identifiable, Codable {
+    let id: UUID = UUID()
+    let label: String   // e.g., Mon, 1, Jan
+    let likes: Int
+    let comments: Int
+    let shares: Int
 }

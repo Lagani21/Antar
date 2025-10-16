@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum ContentType: String, CaseIterable {
+enum ContentType: String, CaseIterable, Codable {
     case post = "Post"
     case reel = "Reel"
     case story = "Story"
