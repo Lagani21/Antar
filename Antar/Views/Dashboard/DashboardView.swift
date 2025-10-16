@@ -7,33 +7,6 @@
 
 import SwiftUI
 
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
-
 struct DashboardView: View {
     @EnvironmentObject var mockDataService: MockDataService
     @State private var showingPostAnalytics = false
@@ -91,7 +64,7 @@ struct AccountNameCard: View {
             // Profile Image
             Circle()
                 .fill(LinearGradient(
-                    colors: [Color(hex: "5a25a4"), Color(hex: "D144C3")],
+                    colors: [.antarDark, .antarAccent1],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
@@ -122,7 +95,7 @@ struct AccountNameCard: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
+        .background(Color.antarBase)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -138,14 +111,14 @@ struct FollowButtonsView: View {
                 title: "Followers",
                 count: account?.followersCount ?? 0,
                 icon: "person.2.fill",
-                color: Color(hex: "5a25a4")
+                color: .antarDark
             )
             
             FollowButton(
                 title: "Following",
                 count: account?.followingCount ?? 0,
                 icon: "person.fill",
-                color: Color(hex: "DD6031")
+                color: .antarAccent2
             )
         }
     }
@@ -175,7 +148,7 @@ struct FollowButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
-            .background(Color(.systemBackground))
+            .background(Color.antarBase)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
@@ -194,21 +167,21 @@ struct ContentAnalyticsButtonsView: View {
             ContentAnalyticsButton(
                 title: "Posts",
                 icon: "square.and.pencil",
-                color: Color(hex: "5a25a4"),
+                color: .antarDark,
                 action: { showingPostAnalytics = true }
             )
             
             ContentAnalyticsButton(
                 title: "Reels",
                 icon: "video.fill",
-                color: Color(hex: "D144C3"),
+                color: .antarAccent1,
                 action: { showingReelAnalytics = true }
             )
             
             ContentAnalyticsButton(
                 title: "Stories",
                 icon: "circle.grid.3x3.fill",
-                color: Color(hex: "DD6031"),
+                color: .antarAccent2,
                 action: { showingStoryAnalytics = true }
             )
         }
@@ -235,7 +208,7 @@ struct ContentAnalyticsButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 24)
-            .background(Color(.systemBackground))
+            .background(Color.antarBase)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
@@ -268,7 +241,7 @@ struct RecentActivityView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color(.systemBackground))
+        .background(Color.antarBase)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .onAppear {
@@ -414,14 +387,14 @@ struct DebugAnalyticsView: View {
                                         title: "Avg Likes",
                                         value: formatNumber(averageStats.likes),
                                         icon: "heart.fill",
-                                        color: Color(hex: "D144C3")
+                                        color: .antarAccent1
                                     )
                                     
                                     AverageMetricCard(
                                         title: "Avg Comments",
                                         value: formatNumber(averageStats.comments),
                                         icon: "message.fill",
-                                        color: Color(hex: "DD6031")
+                                        color: .antarAccent2
                                     )
                                 }
                                 
@@ -430,7 +403,7 @@ struct DebugAnalyticsView: View {
                                         title: "Avg Shares",
                                         value: formatNumber(averageStats.shares),
                                         icon: "arrowshape.turn.up.right.fill",
-                                        color: Color(hex: "FFD333")
+                                        color: .antarAccent3
                                     )
                                     
                                     // Empty space to maintain grid
@@ -440,7 +413,7 @@ struct DebugAnalyticsView: View {
                             }
                         }
                         .padding()
-                        .background(Color(hex: "fde8e9"))
+                        .background(Color.antarBase)
                         .cornerRadius(12)
                         
                         // 2. Most Viral Post (highest likes)
@@ -492,7 +465,7 @@ struct DebugAnalyticsView: View {
                                 }
                             }
                             .padding()
-                            .background(Color(hex: "fde8e9"))
+                            .background(Color.antarBase)
                             .cornerRadius(12)
                         }
                     }
@@ -568,7 +541,7 @@ struct AverageMetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.antarBase)
         .cornerRadius(12)
     }
 }
@@ -634,7 +607,7 @@ struct ContentItemRow: View {
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.antarBase.opacity(0.7))
         .cornerRadius(12)
     }
 }
@@ -680,7 +653,7 @@ struct DetailedAnalyticsView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color.antarBase.opacity(0.7))
                     .cornerRadius(12)
                     
                     // Metrics Cards
@@ -743,7 +716,7 @@ struct DetailedAnalyticsView: View {
                         // Likes breakdown
                         EngagementBreakdownView(
                             title: "Likes",
-                            color: Color(hex: "D144C3"),
+                            color: .antarAccent1,
                             icon: "heart.fill",
                             weekData: post.weekSeries.map { $0.likes },
                             monthData: post.monthSeries.map { $0.likes },
@@ -754,7 +727,7 @@ struct DetailedAnalyticsView: View {
                         // Comments breakdown
                         EngagementBreakdownView(
                             title: "Comments",
-                            color: Color(hex: "DD6031"),
+                            color: .antarAccent2,
                             icon: "message.fill",
                             weekData: post.weekSeries.map { $0.comments },
                             monthData: post.monthSeries.map { $0.comments },
@@ -765,7 +738,7 @@ struct DetailedAnalyticsView: View {
                         // Shares breakdown
                         EngagementBreakdownView(
                             title: "Shares",
-                            color: Color(hex: "FFD333"),
+                            color: .antarAccent3,
                             icon: "arrowshape.turn.up.right.fill",
                             weekData: post.weekSeries.map { $0.shares },
                             monthData: post.monthSeries.map { $0.shares },
@@ -790,7 +763,7 @@ struct DetailedAnalyticsView: View {
                                     Spacer()
                                 }
                                 .padding()
-                                .background(Color(hex: "fde8e9"))
+                                .background(Color.antarBase)
                                 .cornerRadius(8)
                             }
                         }
@@ -862,7 +835,7 @@ struct MetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.antarBase.opacity(0.7))
         .cornerRadius(12)
     }
 }
@@ -970,7 +943,7 @@ struct EngagementBarChart: View {
                 }
                 .padding(.vertical, 8)
             }
-            .background(Color(.secondarySystemBackground))
+            .background(Color.antarBase.opacity(0.7))
             .cornerRadius(10)
         }
     }
@@ -1066,7 +1039,7 @@ struct EngagementBreakdownView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .background(Color(.secondarySystemBackground))
+            .background(Color.antarBase.opacity(0.7))
             .cornerRadius(8)
             
             // Total
@@ -1078,7 +1051,7 @@ struct EngagementBreakdownView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.antarBase)
         .cornerRadius(12)
     }
 }
