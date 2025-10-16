@@ -109,6 +109,7 @@ struct CalendarGridView: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
+            .background(Color.antarButton)
             
             // Calendar days
             LazyVGrid(columns: columns, spacing: 1) {
@@ -131,6 +132,7 @@ struct CalendarGridView: View {
             }
             .padding(.horizontal)
         }
+        .background(Color.antarButton)
     }
     
     private var daysInMonth: [Date?] {
@@ -202,6 +204,7 @@ struct CalendarDayView: View {
         }
         .frame(height: 44)
         .frame(maxWidth: .infinity)
+        .background(Color.antarButton)
     }
 }
 

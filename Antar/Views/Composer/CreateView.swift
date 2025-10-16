@@ -58,6 +58,7 @@ struct CreateView: View {
                     // Action Buttons
                     ActionButtonsView(
                         caption: caption,
+                        notepadText: notepadText,
                         isScheduled: isScheduled,
                         scheduledDate: scheduledDate,
                         contentType: selectedContentType,
@@ -342,6 +343,7 @@ struct DatePickerSheet: View {
 
 struct ActionButtonsView: View {
     let caption: String
+    let notepadText: String
     let isScheduled: Bool
     let scheduledDate: Date
     let contentType: ContentType
@@ -380,26 +382,28 @@ struct ActionButtonsView: View {
     }
     
     private var canSave: Bool {
-        !caption.isEmpty
+        !caption.isEmpty || !notepadText.isEmpty
     }
     
     private func schedulePost() {
         let post = MockPost(
-            caption: caption,
+            caption: caption.isEmpty ? notepadText : caption,
             status: .scheduled,
             scheduledTime: scheduledDate,
-            accountId: mockDataService.activeAccount?.id ?? UUID()
+            accountId: mockDataService.activeAccount?.id ?? UUID(),
+            contentType: contentType
         )
-        mockDataService.posts.append(post)
+        mockDataService.addPost(post)
     }
     
     private func saveAsDraft() {
         let post = MockPost(
-            caption: caption,
+            caption: caption.isEmpty ? notepadText : caption,
             status: .draft,
-            accountId: mockDataService.activeAccount?.id ?? UUID()
+            accountId: mockDataService.activeAccount?.id ?? UUID(),
+            contentType: contentType
         )
-        mockDataService.posts.append(post)
+        mockDataService.addPost(post)
     }
 }
 

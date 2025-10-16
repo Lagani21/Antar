@@ -38,6 +38,7 @@ struct SettingsView: View {
                         }
                     }
                 }
+                .listRowBackground(Color.antarButton)
                 
                 // App Settings
                 Section("Preferences") {
@@ -53,6 +54,7 @@ struct SettingsView: View {
                         Label("Privacy & Security", systemImage: "lock.fill")
                     }
                 }
+                .listRowBackground(Color.antarButton)
                 
                 // About Section
                 Section("About") {
@@ -83,7 +85,10 @@ struct SettingsView: View {
                         }
                     }
                 }
+                .listRowBackground(Color.antarButton)
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.antarBase)
         .navigationTitle("Settings")
         .background(Color.antarBase)
         }
