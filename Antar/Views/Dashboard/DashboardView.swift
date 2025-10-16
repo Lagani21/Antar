@@ -37,8 +37,9 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
-            }
-            .navigationTitle("Dashboard")
+        }
+        .navigationTitle("Dashboard")
+        .background(Color.antarBase)
             .sheet(isPresented: $showingPostAnalytics) {
                 DebugAnalyticsView(contentType: .post)
                     .environmentObject(mockDataService)
@@ -90,12 +91,12 @@ struct AccountNameCard: View {
             
             // Status indicator
             Circle()
-                .fill(.green)
+                .fill(Color.antarAccent1)
                 .frame(width: 12, height: 12)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color.antarBase)
+        .background(Color.antarButton)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -148,7 +149,7 @@ struct FollowButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
-            .background(Color.antarBase)
+            .background(Color.antarButton)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
@@ -208,7 +209,7 @@ struct ContentAnalyticsButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 24)
-            .background(Color.antarBase)
+            .background(Color.antarButton)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
@@ -241,7 +242,7 @@ struct RecentActivityView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color.antarBase)
+        .background(Color.antarButton)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .onAppear {
@@ -257,7 +258,7 @@ struct RecentActivityView: View {
                 message: "New like on 'Exploring Paris' post",
                 timeAgo: "2 minutes ago",
                 icon: "heart.fill",
-                color: .red
+                color: .antarAccent1
             ),
             ActivityItem(
                 id: UUID(),
@@ -265,7 +266,7 @@ struct RecentActivityView: View {
                 message: "New comment from @travelbuddy",
                 timeAgo: "5 minutes ago",
                 icon: "message.fill",
-                color: .blue
+                color: .antarAccent2
             ),
             ActivityItem(
                 id: UUID(),
@@ -273,7 +274,7 @@ struct RecentActivityView: View {
                 message: "New follower: @adventure_seeker",
                 timeAgo: "12 minutes ago",
                 icon: "person.badge.plus.fill",
-                color: .green
+                color: .antarAccent3
             ),
             ActivityItem(
                 id: UUID(),
@@ -413,14 +414,14 @@ struct DebugAnalyticsView: View {
                             }
                         }
                         .padding()
-                        .background(Color.antarBase)
+                        .background(Color.antarButton)
                         .cornerRadius(12)
                         
                         // 2. Most Viral Post (highest likes)
                         if let viralPost = filteredPosts.max(by: { $0.likesCount < $1.likesCount }) {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
-                                    Text("🔥 Most Viral Post")
+                                    Text("Most Viral Post")
                                         .font(.headline)
                                         .fontWeight(.semibold)
                                     Spacer()
@@ -429,7 +430,7 @@ struct DebugAnalyticsView: View {
                                 HStack(spacing: 12) {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(LinearGradient(
-                                            colors: [.red.opacity(0.3), .orange.opacity(0.3)],
+                                            colors: [.antarAccent1.opacity(0.3), .antarAccent2.opacity(0.3)],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ))
@@ -437,7 +438,7 @@ struct DebugAnalyticsView: View {
                                         .overlay(
                                             Image(systemName: "flame.fill")
                                                 .font(.title2)
-                                                .foregroundColor(.red)
+                                                .foregroundColor(.antarAccent1)
                                         )
                                     
                                     VStack(alignment: .leading, spacing: 4) {
@@ -449,15 +450,15 @@ struct DebugAnalyticsView: View {
                                         HStack(spacing: 12) {
                                             Label("\(formatNumber(viralPost.likesCount))", systemImage: "heart.fill")
                                                 .font(.caption)
-                                                .foregroundColor(.red)
+                                                .foregroundColor(.antarAccent1)
                                             
                                             Label("\(formatNumber(viralPost.commentsCount))", systemImage: "message.fill")
                                                 .font(.caption)
-                                                .foregroundColor(.green)
+                                                .foregroundColor(.antarAccent2)
                                             
                                             Label("\(formatNumber(viralPost.sharesCount))", systemImage: "arrowshape.turn.up.right.fill")
                                                 .font(.caption)
-                                                .foregroundColor(.orange)
+                                                .foregroundColor(.antarAccent3)
                                         }
                                     }
                                     
@@ -465,7 +466,7 @@ struct DebugAnalyticsView: View {
                                 }
                             }
                             .padding()
-                            .background(Color.antarBase)
+                            .background(Color.antarButton)
                             .cornerRadius(12)
                         }
                     }
@@ -486,9 +487,7 @@ struct DebugAnalyticsView: View {
                         } else {
                             ForEach(filteredPosts) { post in
                                 Button(action: {
-                                    print("🖱️ Tapped post: \(post.caption.prefix(30))")
                                     selectedPost = post
-                                    print("📊 selectedPost set to: \(selectedPost?.caption ?? "nil")")
                                 }) {
                                     ContentItemRow(post: post, contentType: contentType)
                                 }
@@ -541,7 +540,7 @@ struct AverageMetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color.antarBase)
+        .background(Color.antarButton)
         .cornerRadius(12)
     }
 }
@@ -555,7 +554,7 @@ struct ContentItemRow: View {
             // Thumbnail placeholder
             RoundedRectangle(cornerRadius: 8)
                 .fill(LinearGradient(
-                    colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                    colors: [.antarDark.opacity(0.3), .antarAccent1.opacity(0.3)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
@@ -585,6 +584,7 @@ struct ContentItemRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "heart.fill")
                             .font(.caption)
+                            .foregroundColor(.antarAccent1)
                         Text(formatNumber(post.likesCount))
                             .font(.caption)
                     }
@@ -593,6 +593,7 @@ struct ContentItemRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "message.fill")
                             .font(.caption)
+                            .foregroundColor(.antarAccent2)
                         Text(formatNumber(post.commentsCount))
                             .font(.caption)
                     }
@@ -607,7 +608,7 @@ struct ContentItemRow: View {
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color.antarBase.opacity(0.7))
+        .background(Color.antarBase.opacity(0.8))
         .cornerRadius(12)
     }
 }
@@ -626,7 +627,7 @@ struct DetailedAnalyticsView: View {
                         HStack {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(LinearGradient(
-                                    colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                                    colors: [.antarDark.opacity(0.3), .antarAccent1.opacity(0.3)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ))
@@ -653,7 +654,7 @@ struct DetailedAnalyticsView: View {
                         }
                     }
                     .padding()
-                    .background(Color.antarBase.opacity(0.7))
+                    .background(Color.antarBase.opacity(0.8))
                     .cornerRadius(12)
                     
                     // Metrics Cards
@@ -663,7 +664,7 @@ struct DetailedAnalyticsView: View {
                                 title: "Impressions",
                                 value: formatNumber(post.impressions),
                                 icon: "eye.fill",
-                                color: .blue
+                                color: .antarDark
                             )
                             
                             MetricCard(
@@ -679,14 +680,14 @@ struct DetailedAnalyticsView: View {
                                 title: "Likes",
                                 value: formatNumber(post.likesCount),
                                 icon: "heart.fill",
-                                color: .red
+                                color: .antarAccent1
                             )
                             
                             MetricCard(
                                 title: "Comments",
                                 value: formatNumber(post.commentsCount),
                                 icon: "message.fill",
-                                color: .green
+                                color: .antarAccent2
                             )
                         }
                         
@@ -763,7 +764,7 @@ struct DetailedAnalyticsView: View {
                                     Spacer()
                                 }
                                 .padding()
-                                .background(Color.antarBase)
+                                .background(Color.antarButton)
                                 .cornerRadius(8)
                             }
                         }
@@ -787,25 +788,25 @@ struct DetailedAnalyticsView: View {
         var result: [String] = []
         
         if post.engagementRate > 5 {
-            result.append("🎉 High engagement rate!")
+            result.append("High engagement rate")
         } else if post.engagementRate < 2 {
-            result.append("💡 Try adding more engaging content")
+            result.append("Try adding more engaging content")
         }
         
         if post.impressions > post.reach * 2 {
-            result.append("🔄 Good re-viewing rate")
+            result.append("Good re-viewing rate")
         }
         
         if post.likesCount > post.impressions / 10 {
-            result.append("❤️ Great like-to-impression ratio")
+            result.append("Great like-to-impression ratio")
         }
         
         if post.commentsCount > post.likesCount / 5 {
-            result.append("💬 Strong community engagement")
+            result.append("Strong community engagement")
         }
         
         if result.isEmpty {
-            result.append("📊 Keep posting consistently")
+            result.append("Keep posting consistently")
         }
         
         return result
@@ -835,7 +836,7 @@ struct MetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color.antarBase.opacity(0.7))
+        .background(Color.antarBase.opacity(0.8))
         .cornerRadius(12)
     }
 }
@@ -884,21 +885,21 @@ struct SegmentedEngagementCharts: View {
                         Text(tf.rawValue)
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(timeframe == tf ? .white : .blue)
+                            .foregroundColor(timeframe == tf ? .white : .antarDark)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
-                            .background(timeframe == tf ? Color.blue : Color.blue.opacity(0.1))
+                            .background(timeframe == tf ? Color.antarDark : Color.antarDark.opacity(0.1))
                             .cornerRadius(18)
                     }
                 }
             }
 
             // Likes chart
-            EngagementBarChart(points: aggregated, keyPath: \.likes, title: "Likes", color: .red)
+            EngagementBarChart(points: aggregated, keyPath: \.likes, title: "Likes", color: .antarAccent1)
             // Comments chart
-            EngagementBarChart(points: aggregated, keyPath: \.comments, title: "Comments", color: .green)
+            EngagementBarChart(points: aggregated, keyPath: \.comments, title: "Comments", color: .antarAccent2)
             // Shares chart
-            EngagementBarChart(points: aggregated, keyPath: \.shares, title: "Shares", color: .orange)
+            EngagementBarChart(points: aggregated, keyPath: \.shares, title: "Shares", color: .antarAccent3)
         }
         .padding(.horizontal)
     }
@@ -943,7 +944,7 @@ struct EngagementBarChart: View {
                 }
                 .padding(.vertical, 8)
             }
-            .background(Color.antarBase.opacity(0.7))
+            .background(Color.antarBase.opacity(0.8))
             .cornerRadius(10)
         }
     }
@@ -1039,7 +1040,7 @@ struct EngagementBreakdownView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .background(Color.antarBase.opacity(0.7))
+            .background(Color.antarBase.opacity(0.8))
             .cornerRadius(8)
             
             // Total
@@ -1051,7 +1052,7 @@ struct EngagementBreakdownView: View {
             }
         }
         .padding()
-        .background(Color.antarBase)
+        .background(Color.antarButton)
         .cornerRadius(12)
     }
 }

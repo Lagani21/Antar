@@ -39,6 +39,7 @@ struct DraftsView: View {
                 }
             }
             .navigationTitle("Drafts")
+            .background(Color.antarBase)
         }
     }
 }
@@ -51,7 +52,7 @@ struct DraftCard: View {
             // Thumbnail placeholder
             Rectangle()
                 .fill(LinearGradient(
-                    colors: [.blue.opacity(0.2), .purple.opacity(0.2)],
+                    colors: [.antarDark.opacity(0.2), .antarAccent1.opacity(0.2)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
@@ -74,7 +75,7 @@ struct DraftCard: View {
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.antarButton)
         .cornerRadius(12)
         .shadow(radius: 2)
     }

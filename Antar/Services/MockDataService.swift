@@ -59,12 +59,12 @@ class MockDataService: ObservableObject {
         
         // Published POSTS
         let postCaptions = [
-            "Exploring the beautiful streets of Paris 🇫🇷✨",
-            "Sunset views that take your breath away 🌅",
-            "Coffee and croissants make everything better ☕🥐",
-            "Adventure awaits around every corner 🗺️",
-            "Hidden gems in the city 🏛️",
-            "Morning vibes ☀️"
+            "Exploring the beautiful streets of Paris",
+            "Sunset views that take your breath away",
+            "Coffee and croissants make everything better",
+            "Adventure awaits around every corner",
+            "Hidden gems in the city",
+            "Morning vibes"
         ]
         
         for i in 0..<6 {
@@ -93,11 +93,11 @@ class MockDataService: ObservableObject {
         
         // Published REELS
         let reelCaptions = [
-            "Quick travel tips for your next adventure! 🎥✈️",
-            "Best cafes in the city - Part 1 🎬☕",
-            "Day in my life as a traveler 🌍",
-            "Hidden photography spots 📸",
-            "Travel hacks you need to know! 💡"
+            "Quick travel tips for your next adventure!",
+            "Best cafes in the city - Part 1",
+            "Day in my life as a traveler",
+            "Hidden photography spots",
+            "Travel hacks you need to know!"
         ]
         
         for i in 0..<5 {
@@ -122,10 +122,10 @@ class MockDataService: ObservableObject {
         
         // Published STORIES
         let storyCaptions = [
-            "Behind the scenes 📷",
-            "Quick update! ⚡",
-            "Today's mood 🌈",
-            "Ask me anything 💬"
+            "Behind the scenes",
+            "Quick update",
+            "Today's mood",
+            "Ask me anything"
         ]
         
         for i in 0..<4 {
@@ -150,8 +150,8 @@ class MockDataService: ObservableObject {
         
         // Draft posts
         let draftCaptions = [
-            "Working on something amazing 💭",
-            "Draft thoughts and ideas 📝"
+            "Working on something amazing",
+            "Draft thoughts and ideas"
         ]
         
         for i in 0..<2 {

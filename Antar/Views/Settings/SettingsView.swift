@@ -32,9 +32,9 @@ struct SettingsView: View {
                     Button(action: { addAccount() }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.antarDark)
                             Text("Add Instagram Account")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.antarDark)
                         }
                     }
                 }
@@ -83,8 +83,9 @@ struct SettingsView: View {
                         }
                     }
                 }
-            }
-            .navigationTitle("Settings")
+        }
+        .navigationTitle("Settings")
+        .background(Color.antarBase)
         }
     }
     
@@ -118,7 +119,7 @@ struct AccountRowView: View {
                 // Profile Image
                 Circle()
                     .fill(LinearGradient(
-                        colors: [.blue, .purple],
+                        colors: [.antarDark, .antarAccent1],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ))
@@ -148,7 +149,7 @@ struct AccountRowView: View {
                         .scaleEffect(0.8)
                 } else if isActive {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.antarDark)
                         .font(.title3)
                 }
             }

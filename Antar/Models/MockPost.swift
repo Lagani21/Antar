@@ -16,11 +16,11 @@ enum PostStatus: String, Codable {
     var color: Color {
         switch self {
         case .draft:
-            return .gray
+            return .antarAccent2
         case .scheduled:
-            return .blue
+            return .antarAccent1
         case .published:
-            return .green
+            return .antarDark
         }
     }
 }

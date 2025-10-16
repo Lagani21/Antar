@@ -35,6 +35,7 @@ struct CalendarView: View {
                 )
             }
             .navigationTitle("Calendar")
+            .background(Color.antarBase)
         }
     }
 }
@@ -53,7 +54,7 @@ struct CalendarHeaderView: View {
             Button(action: { previousMonth() }) {
                 Image(systemName: "chevron.left")
                     .font(.title2)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.antarDark)
             }
             
             Spacer()
@@ -67,12 +68,12 @@ struct CalendarHeaderView: View {
             Button(action: { nextMonth() }) {
                 Image(systemName: "chevron.right")
                     .font(.title2)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.antarDark)
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color.antarButton)
     }
     
     private func previousMonth() {
@@ -177,11 +178,11 @@ struct CalendarDayView: View {
         VStack(spacing: 2) {
             Text("\(calendar.component(.day, from: date))")
                 .font(.system(size: 16, weight: isToday ? .bold : .regular))
-                .foregroundColor(isToday ? .white : (isSelected ? .blue : .primary))
+                .foregroundColor(isToday ? .white : (isSelected ? .antarDark : .primary))
                 .frame(width: 32, height: 32)
                 .background(
                     Circle()
-                        .fill(isToday ? Color.blue : (isSelected ? Color.blue.opacity(0.2) : Color.clear))
+                        .fill(isToday ? Color.antarDark : (isSelected ? Color.antarDark.opacity(0.2) : Color.clear))
                 )
             
             // Post indicators
@@ -230,7 +231,7 @@ struct SelectedDatePostsView: View {
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.1))
+                        .background(Color.antarDark.opacity(0.1))
                         .cornerRadius(8)
                 }
             }
@@ -248,7 +249,7 @@ struct SelectedDatePostsView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.antarButton)
         .cornerRadius(12)
         .padding()
     }
@@ -298,7 +299,7 @@ struct CalendarPostCard: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background(Color(.secondarySystemBackground))
+        .background(Color.antarButton)
         .cornerRadius(8)
     }
     

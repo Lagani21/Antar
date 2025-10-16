@@ -43,8 +43,16 @@ struct MainTabView: View {
                 }
                 .tag(4)
         }
-        .accentColor(.blue)
+        .accentColor(.antarDark)
         .animation(nil, value: selectedTab)
+        .background(Color.antarBase)
+        .onAppear {
+            // Set the background color for the entire app
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                window.backgroundColor = UIColor(Color.antarBase)
+            }
+        }
     }
 }
 

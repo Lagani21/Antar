@@ -10,10 +10,11 @@ import SwiftUI
 extension Color {
     // Custom color palette
     static let antarDark = Color(hex: "5a25a4")      // Dark tones
-    static let antarBase = Color(hex: "fde8e9")      // Base color
+    static let antarBase = Color(hex: "EBDEF7")      // Base color
     static let antarAccent1 = Color(hex: "D144C3")   // Pink accent
     static let antarAccent2 = Color(hex: "DD6031")   // Orange accent
     static let antarAccent3 = Color(hex: "FFD333")   // Yellow accent
+    static let antarButton = Color(hex: "F5EFFB")    // Light lavender for buttons
     
     // Convenience initializer for hex colors
     init(hex: String) {

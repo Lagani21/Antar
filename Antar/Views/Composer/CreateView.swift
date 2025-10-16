@@ -65,9 +65,10 @@ struct CreateView: View {
                     )
                 }
                 .padding()
-            }
-            .navigationTitle("Create")
-            .navigationBarTitleDisplayMode(.inline)
+        }
+        .navigationTitle("Create")
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color.antarBase)
         }
     }
 }
@@ -104,7 +105,7 @@ struct ContentTypeCard: View {
         VStack(spacing: 8) {
             Image(systemName: type.icon)
                 .font(.system(size: 28))
-                .foregroundColor(isSelected ? .white : .blue)
+                .foregroundColor(isSelected ? .white : .antarDark)
             
             Text(type.rawValue)
                 .font(.subheadline)
@@ -113,11 +114,11 @@ struct ContentTypeCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
+        .background(isSelected ? Color.antarDark : Color.antarButton)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                .stroke(isSelected ? Color.antarDark : Color.clear, lineWidth: 2)
         )
     }
 }
@@ -159,11 +160,11 @@ struct MediaPlaceholderView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 200)
-        .background(Color(.secondarySystemBackground))
+        .background(Color.antarButton)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.blue.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [5]))
+                .stroke(Color.antarDark.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [5]))
         )
     }
 }
@@ -183,17 +184,17 @@ struct CaptionSectionView: View {
                 
                 Text("\(caption.count)/\(characterLimit)")
                     .font(.caption)
-                    .foregroundColor(caption.count > characterLimit ? .red : .secondary)
+                    .foregroundColor(caption.count > characterLimit ? .antarAccent1 : .secondary)
             }
             
             TextEditor(text: $caption)
                 .frame(minHeight: 100)
                 .padding(8)
-                .background(Color(.secondarySystemBackground))
+                .background(Color.antarButton)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(caption.count > characterLimit ? Color.red : Color.clear, lineWidth: 1)
+                        .stroke(caption.count > characterLimit ? Color.antarAccent1 : Color.clear, lineWidth: 1)
                 )
             
             Button(action: { generateAICaption() }) {
@@ -202,20 +203,20 @@ struct CaptionSectionView: View {
                     Text("Generate AI Caption")
                 }
                 .font(.callout)
-                .foregroundColor(.blue)
+                .foregroundColor(.antarDark)
             }
         }
     }
     
     private func generateAICaption() {
         let aiCaptions = [
-            "✨ Embrace the journey, not just the destination 🌟",
-            "Creating memories one adventure at a time 🌍✈️",
-            "Living in the moment, loving every second 💫",
-            "Dream big, travel far, live fully 🗺️❤️",
-            "Chasing sunsets and making memories 🌅",
-            "Not all who wander are lost 🌍",
-            "The world is a book, and those who do not travel read only one page 📖"
+            "Embrace the journey, not just the destination",
+            "Creating memories one adventure at a time",
+            "Living in the moment, loving every second ",
+            "Dream big, travel far, live fully",
+            "Chasing sunsets and making memories",
+            "Not all who wander are lost",
+            "The world is a book, and those who do not travel read only one page "
         ]
         
         caption = aiCaptions.randomElement() ?? aiCaptions[0]
@@ -231,7 +232,7 @@ struct NotepadSectionView: View {
             Button(action: { isExpanded.toggle() }) {
                 HStack {
                     Image(systemName: "note.text")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.antarDark)
                     Text("Notepad")
                         .font(.headline)
                         .fontWeight(.semibold)
@@ -252,7 +253,7 @@ struct NotepadSectionView: View {
                     TextEditor(text: $notepadText)
                         .frame(minHeight: 80)
                         .padding(8)
-                        .background(Color(.tertiarySystemBackground))
+                        .background(Color.antarButton)
                         .cornerRadius(8)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
@@ -262,7 +263,7 @@ struct NotepadSectionView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.antarButton)
         .cornerRadius(12)
     }
 }
@@ -276,7 +277,7 @@ struct SchedulingSectionView: View {
         VStack(alignment: .leading, spacing: 12) {
             Toggle("Schedule for later", isOn: $isScheduled)
                 .font(.headline)
-                .tint(.blue)
+                .tint(.antarDark)
             
             if isScheduled {
                 Button(action: { showingDatePicker = true }) {
@@ -289,7 +290,7 @@ struct SchedulingSectionView: View {
                     .font(.callout)
                     .foregroundColor(.primary)
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color.antarButton)
                     .cornerRadius(8)
                 }
                 .sheet(isPresented: $showingDatePicker) {
@@ -359,7 +360,7 @@ struct ActionButtonsView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(canSave ? Color.blue : Color.gray)
+                        .background(canSave ? Color.antarDark : Color.gray)
                         .cornerRadius(12)
                 }
                 .disabled(!canSave)
@@ -368,10 +369,10 @@ struct ActionButtonsView: View {
             Button(action: { saveAsDraft() }) {
                 Text("Save as Draft")
                     .font(.headline)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.antarDark)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(Color.blue.opacity(0.1))
+                    .background(Color.antarDark.opacity(0.1))
                     .cornerRadius(12)
             }
             .disabled(!canSave)
