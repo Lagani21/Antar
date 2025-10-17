@@ -105,55 +105,284 @@ struct AccountNameCard: View {
 // MARK: - Followers & Following Buttons
 struct FollowButtonsView: View {
     let account: InstagramAccount?
+    @StateObject private var followerAnalytics = FollowerAnalyticsService.shared
+    
+    var growth: Int {
+        guard let account = account else { return 0 }
+        return followerAnalytics.getFollowerGrowth(for: account.id, timeframe: .week)
+    }
     
     var body: some View {
         HStack(spacing: 12) {
-            FollowButton(
-                title: "Followers",
-                count: account?.followersCount ?? 0,
-                icon: "person.2.fill",
-                color: .antarDark
-            )
-            
-            FollowButton(
-                title: "Following",
-                count: account?.followingCount ?? 0,
-                icon: "person.fill",
-                color: .antarAccent2
-            )
+            if let account = account {
+                NavigationLink(destination: FollowerAnalyticsView(account: account)) {
+                    FollowButtonContent(
+                        title: "Followers",
+                        count: account.followersCount,
+                        growth: growth,
+                        icon: "person.2.fill",
+                        color: .antarDark
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                NavigationLink(destination: FollowerAnalyticsView(account: account)) {
+                    FollowButtonContent(
+                        title: "Following",
+                        count: account.followingCount,
+                        growth: 0, // Following doesn't typically show growth
+                        icon: "person.fill",
+                        color: .antarAccent2
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+        .onAppear {
+            if let account = account {
+                // Generate mock history if needed
+                if followerAnalytics.followerHistory[account.id] == nil {
+                    followerAnalytics.generateMockHistoryForAccount(account)
+                }
+            }
         }
     }
 }
 
-struct FollowButton: View {
+struct FollowButtonContent: View {
     let title: String
     let count: Int
+    let growth: Int
     let icon: String
     let color: Color
     
     var body: some View {
-        Button(action: {}) {
-            VStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(color)
-                
-                Text(formatNumber(count))
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(color)
+            
+            Text(formatNumber(count))
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            // Always show growth section to maintain consistent height
+            HStack(spacing: 4) {
+                if growth != 0 {
+                    Image(systemName: growth > 0 ? "arrow.up" : "arrow.down")
+                        .font(.caption2)
+                    Text("\(abs(growth))")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                } else {
+                    // Invisible placeholder to maintain height
+                    Image(systemName: "arrow.up")
+                        .font(.caption2)
+                        .opacity(0)
+                    Text("0")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .opacity(0)
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(Color.antarButton)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .foregroundColor(growth > 0 ? .green : (growth < 0 ? .red : .clear))
+            
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .buttonStyle(PlainButtonStyle())
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(Color.antarButton)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+// MARK: - Follower Growth Chart
+struct FollowerGrowthChartView: View {
+    let account: InstagramAccount
+    @StateObject private var followerAnalytics = FollowerAnalyticsService.shared
+    @State private var selectedTimeframe: FollowerAnalyticsTimeframe = .week
+    
+    var dataPoints: [FollowerDataPoint] {
+        followerAnalytics.getFollowerData(for: account.id, timeframe: selectedTimeframe)
+    }
+    
+    var growth: Int {
+        followerAnalytics.getFollowerGrowth(for: account.id, timeframe: selectedTimeframe)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Follower Growth")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                // Timeframe selector
+                HStack(spacing: 6) {
+                    ForEach(FollowerAnalyticsTimeframe.allCases, id: \.self) { timeframe in
+                        Button(action: {
+                            withAnimation {
+                                selectedTimeframe = timeframe
+                            }
+                        }) {
+                            Text(timeframe.rawValue)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(selectedTimeframe == timeframe ? .white : .antarDark)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(selectedTimeframe == timeframe ? Color.antarDark : Color.antarDark.opacity(0.1))
+                                .cornerRadius(12)
+                        }
+                    }
+                }
+            }
+            
+            if !dataPoints.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    // Growth indicator
+                    HStack(spacing: 8) {
+                        Image(systemName: growth >= 0 ? "arrow.up.right" : "arrow.down.right")
+                            .font(.title3)
+                            .foregroundColor(growth >= 0 ? .green : .red)
+                        
+                        Text("\(growth >= 0 ? "+" : "")\(growth)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(growth >= 0 ? .green : .red)
+                        
+                        Text("followers this \(selectedTimeframe.rawValue.lowercased())")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Mini chart
+                    MiniLineChart(dataPoints: dataPoints)
+                        .frame(height: 80)
+                }
+            } else {
+                Text("No data available yet")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 20)
+            }
+            
+            // View full analytics button
+            NavigationLink(destination: FollowerAnalyticsView(account: account)) {
+                HStack {
+                    Text("View Detailed Analytics")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.antarDark)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.antarDark)
+                }
+                .padding(.vertical, 8)
+            }
+        }
+        .padding()
+        .background(Color.antarButton)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .onAppear {
+            // Generate mock history if needed
+            if followerAnalytics.followerHistory[account.id] == nil {
+                followerAnalytics.generateMockHistoryForAccount(account)
+            }
+        }
+    }
+}
+
+struct MiniLineChart: View {
+    let dataPoints: [FollowerDataPoint]
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            let height = geometry.size.height
+            let minValue = CGFloat(dataPoints.map { $0.count }.min() ?? 0)
+            let maxValue = CGFloat(dataPoints.map { $0.count }.max() ?? 1)
+            let range = maxValue - minValue
+            
+            ZStack(alignment: .bottomLeading) {
+                // Background grid lines
+                VStack(spacing: 0) {
+                    ForEach(0..<3) { _ in
+                        Divider()
+                            .background(Color.gray.opacity(0.2))
+                        Spacer()
+                    }
+                }
+                
+                // Line path
+                Path { path in
+                    let points = dataPoints.enumerated().map { index, point -> CGPoint in
+                        let x = (width / CGFloat(max(dataPoints.count - 1, 1))) * CGFloat(index)
+                        let normalizedValue = range > 0 ? (CGFloat(point.count) - minValue) / range : 0.5
+                        let y = height - (normalizedValue * height)
+                        return CGPoint(x: x, y: y)
+                    }
+                    
+                    guard let firstPoint = points.first else { return }
+                    path.move(to: firstPoint)
+                    
+                    for point in points.dropFirst() {
+                        path.addLine(to: point)
+                    }
+                }
+                .stroke(
+                    LinearGradient(
+                        colors: [.antarDark, .antarAccent1],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    lineWidth: 2
+                )
+                
+                // Area fill
+                Path { path in
+                    let points = dataPoints.enumerated().map { index, point -> CGPoint in
+                        let x = (width / CGFloat(max(dataPoints.count - 1, 1))) * CGFloat(index)
+                        let normalizedValue = range > 0 ? (CGFloat(point.count) - minValue) / range : 0.5
+                        let y = height - (normalizedValue * height)
+                        return CGPoint(x: x, y: y)
+                    }
+                    
+                    guard let firstPoint = points.first else { return }
+                    path.move(to: CGPoint(x: firstPoint.x, y: height))
+                    path.addLine(to: firstPoint)
+                    
+                    for point in points.dropFirst() {
+                        path.addLine(to: point)
+                    }
+                    
+                    if let lastPoint = points.last {
+                        path.addLine(to: CGPoint(x: lastPoint.x, y: height))
+                    }
+                    path.closeSubpath()
+                }
+                .fill(
+                    LinearGradient(
+                        colors: [.antarDark.opacity(0.2), .antarAccent1.opacity(0.05)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            }
+        }
+        .background(Color.antarBase.opacity(0.5))
+        .cornerRadius(8)
     }
 }
 
@@ -381,36 +610,28 @@ struct DebugAnalyticsView: View {
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             
-                            // Average Metrics Cards - Only Likes, Comments, Shares
-                            VStack(spacing: 12) {
-                                HStack(spacing: 12) {
-                                    AverageMetricCard(
-                                        title: "Avg Likes",
-                                        value: formatNumber(averageStats.likes),
-                                        icon: "heart.fill",
-                                        color: .antarAccent1
-                                    )
-                                    
-                                    AverageMetricCard(
-                                        title: "Avg Comments",
-                                        value: formatNumber(averageStats.comments),
-                                        icon: "message.fill",
-                                        color: .antarAccent2
-                                    )
-                                }
+                            // Average Metrics Cards - Only Likes, Comments, Shares in one row
+                            HStack(spacing: 12) {
+                                AverageMetricCard(
+                                    title: "Avg Likes",
+                                    value: formatNumber(averageStats.likes),
+                                    icon: "heart.fill",
+                                    color: .antarAccent1
+                                )
                                 
-                                HStack(spacing: 12) {
-                                    AverageMetricCard(
-                                        title: "Avg Shares",
-                                        value: formatNumber(averageStats.shares),
-                                        icon: "arrowshape.turn.up.right.fill",
-                                        color: .antarAccent3
-                                    )
-                                    
-                                    // Empty space to maintain grid
-                                    Color.clear
-                                        .frame(maxWidth: .infinity)
-                                }
+                                AverageMetricCard(
+                                    title: "Avg Comments",
+                                    value: formatNumber(averageStats.comments),
+                                    icon: "message.fill",
+                                    color: .antarAccent2
+                                )
+                                
+                                AverageMetricCard(
+                                    title: "Avg Shares",
+                                    value: formatNumber(averageStats.shares),
+                                    icon: "arrowshape.turn.up.right.fill",
+                                    color: .antarAccent3
+                                )
                             }
                         }
                         .padding()

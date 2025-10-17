@@ -9,7 +9,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var mockDataService: MockDataService
+    @StateObject private var authService = InstagramAuthService.shared
+    @StateObject private var apiService = InstagramAPIService.shared
+    @StateObject private var followerAnalytics = FollowerAnalyticsService.shared
+    
     @State private var isSwitching = false
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         NavigationView {
@@ -31,12 +37,20 @@ struct SettingsView: View {
                     
                     Button(action: { addAccount() }) {
                         HStack {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.antarDark)
-                            Text("Add Instagram Account")
-                                .foregroundColor(.antarDark)
+                            if authService.isAuthenticating {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Connecting...")
+                                    .foregroundColor(.antarDark)
+                            } else {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.antarDark)
+                                Text("Add Instagram Account")
+                                    .foregroundColor(.antarDark)
+                            }
                         }
                     }
+                    .disabled(authService.isAuthenticating)
                 }
                 .listRowBackground(Color.antarButton)
                 
@@ -91,6 +105,11 @@ struct SettingsView: View {
         .background(Color.antarBase)
         .navigationTitle("Settings")
         .background(Color.antarBase)
+        .alert("Connection Error", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
         }
     }
     
@@ -107,8 +126,66 @@ struct SettingsView: View {
     }
     
     private func addAccount() {
-        // In a real app, this would trigger Instagram OAuth
-        print("Add account tapped - would trigger Instagram OAuth")
+        // Start Instagram OAuth flow
+        authService.authenticate { result in
+            switch result {
+            case .success(let account):
+                // Add the account to our data service
+                var newAccount = account
+                
+                // If this is the first account, make it active
+                if mockDataService.accounts.isEmpty {
+                    newAccount.isActive = true
+                    mockDataService.activeAccount = newAccount
+                } else {
+                    newAccount.isActive = false
+                }
+                
+                mockDataService.accounts.append(newAccount)
+                
+                // Fetch user media for the new account
+                if let accessToken = account.accessToken {
+                    fetchAccountData(accessToken: accessToken, accountId: account.id)
+                }
+                
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+                showError = true
+            }
+        }
+    }
+    
+    private func fetchAccountData(accessToken: String, accountId: UUID) {
+        // Fetch user media
+        apiService.fetchUserMedia(accessToken: accessToken) { result in
+            switch result {
+            case .success(let media):
+                print("Fetched \(media.count) media items")
+                // TODO: Convert Instagram media to MockPost format and add to mockDataService
+                
+            case .failure(let error):
+                print("Failed to fetch media: \(error.localizedDescription)")
+            }
+        }
+        
+        // Fetch follower insights
+        apiService.fetchFollowerInsights(accessToken: accessToken) { result in
+            switch result {
+            case .success(let insights):
+                print("Fetched follower insights: \(insights.followerCount) followers")
+                // Record the data for analytics
+                if let account = mockDataService.accounts.first(where: { $0.id == accountId }) {
+                    followerAnalytics.recordFollowerData(for: account)
+                }
+                
+            case .failure(let error):
+                print("Failed to fetch follower insights: \(error.localizedDescription)")
+                // Still record current follower count from profile
+                if let account = mockDataService.accounts.first(where: { $0.id == accountId }) {
+                    followerAnalytics.recordFollowerData(for: account)
+                }
+            }
+        }
     }
 }
 
@@ -119,48 +196,84 @@ struct AccountRowView: View {
     let onTap: () -> Void
     
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                // Profile Image
-                Circle()
-                    .fill(LinearGradient(
-                        colors: [.antarDark, .antarAccent1],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
-                    .frame(width: 50, height: 50)
-                    .overlay(
-                        Text(String(account.username.prefix(1)).uppercased())
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                    )
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("@\(account.username)")
-                        .font(.callout)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
+        VStack(spacing: 0) {
+            Button(action: onTap) {
+                HStack(spacing: 12) {
+                    // Profile Image
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [.antarDark, .antarAccent1],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Text(String(account.username.prefix(1)).uppercased())
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                        )
                     
-                    Text("\(formatNumber(account.followersCount)) followers")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("@\(account.username)")
+                            .font(.callout)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                        
+                        HStack(spacing: 4) {
+                            Text("\(formatNumber(account.followersCount)) followers")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Text("\(formatNumber(account.followingCount)) following")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    if isSwitching {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else if isActive {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.antarDark)
+                            .font(.title3)
+                    }
                 }
-                
-                Spacer()
-                
-                if isSwitching {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                } else if isActive {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.antarDark)
-                        .font(.title3)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // Analytics Link (only show for active account)
+            if isActive {
+                NavigationLink(destination: FollowerAnalyticsView(account: account)) {
+                    HStack {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.caption)
+                            .foregroundColor(.antarDark)
+                        
+                        Text("View Analytics")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.antarDark)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
                 }
             }
-            .contentShape(Rectangle())
         }
-        .buttonStyle(PlainButtonStyle())
     }
     
     private func formatNumber(_ number: Int) -> String {

@@ -94,9 +94,17 @@ struct MockPost: Identifiable, Codable {
 }
 
 struct EngagementPoint: Identifiable, Codable {
-    let id: UUID = UUID()
+    let id: UUID
     let label: String   // e.g., Mon, 1, Jan
     let likes: Int
     let comments: Int
     let shares: Int
+    
+    init(id: UUID = UUID(), label: String, likes: Int, comments: Int, shares: Int) {
+        self.id = id
+        self.label = label
+        self.likes = likes
+        self.comments = comments
+        self.shares = shares
+    }
 }

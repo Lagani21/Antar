@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Add this to your Info.plist or configure in Xcode Project Settings -->
+	
+	<!-- URL Types for Instagram OAuth Callback -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.antar.instagram</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>antarapp</string>
+			</array>
+		</dict>
+	</array>
+	
+	<!-- Allow opening Instagram links -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>instagram-stories</string>
+	</array>
+	
+	<!-- Privacy descriptions (required for iOS) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select images for posting to Instagram.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to take photos for posting to Instagram.</string>
+	
+</dict>
+</plist>
+
