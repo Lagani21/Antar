@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CalendarView: View {
     @EnvironmentObject var mockDataService: MockDataService
+    @StateObject private var mockAPI = MockInstagramGraphAPIService.shared
     @State private var selectedDate = Date()
     @State private var currentMonth = Date()
+    @State private var isLoadingMedia = false
     
     private let calendar = Calendar.current
     private let dateFormatter = DateFormatter()
@@ -18,8 +20,16 @@ struct CalendarView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Calendar Header
-                CalendarHeaderView(currentMonth: $currentMonth)
+                // Calendar Header with API Demo Button
+                VStack(spacing: 0) {
+                    CalendarHeaderView(currentMonth: $currentMonth)
+                    
+                    // API Demo Section
+                    APIDemoSection(
+                        isLoadingMedia: $isLoadingMedia,
+                        onRefreshMedia: refreshMediaFromAPI
+                    )
+                }
                 
                 // Calendar Grid
                 CalendarGridView(
@@ -36,6 +46,26 @@ struct CalendarView: View {
             }
             .navigationTitle("Calendar")
             .background(Color.antarBase)
+        }
+    }
+    
+    private func refreshMediaFromAPI() {
+        isLoadingMedia = true
+        
+        Task {
+            // Simulate fetching media from Instagram API
+            let result = await mockAPI.getUserMedia()
+            
+            await MainActor.run {
+                isLoadingMedia = false
+                
+                switch result {
+                case .success(let mediaItems):
+                    print("📅 Calendar: Fetched \(mediaItems.count) media items from API")
+                case .failure(let error):
+                    print("📅 Calendar: Failed to fetch media: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }
@@ -310,6 +340,59 @@ struct CalendarPostCard: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+}
+
+// MARK: - API Demo Section
+
+struct APIDemoSection: View {
+    @Binding var isLoadingMedia: Bool
+    let onRefreshMedia: () -> Void
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("API Demo")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.secondary)
+                
+                Text("Refresh media from Instagram API")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Button(action: onRefreshMedia) {
+                HStack(spacing: 6) {
+                    if isLoadingMedia {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    Text(isLoadingMedia ? "Loading..." : "Refresh")
+                        .font(.caption)
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    LinearGradient(
+                        colors: [.antarDark, .antarAccent1],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(8)
+            }
+            .disabled(isLoadingMedia)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color.antarButton.opacity(0.5))
     }
 }
 

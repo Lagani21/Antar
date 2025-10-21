@@ -9,14 +9,22 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var dataService: DataService
+    @StateObject private var mockAPI = MockInstagramGraphAPIService.shared
     @State private var showingPostAnalytics = false
     @State private var showingReelAnalytics = false
     @State private var showingStoryAnalytics = false
+    @State private var isLoadingProfile = false
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
+                    // API Demo Section
+                    DashboardAPIDemoSection(
+                        isLoadingProfile: $isLoadingProfile,
+                        onRefreshProfile: refreshProfileFromAPI
+                    )
+                    
                     // 1. Account Name (full width)
                     if let account = dataService.activeAccount {
                         AccountNameCard(account: account)
@@ -51,6 +59,29 @@ struct DashboardView: View {
             .sheet(isPresented: $showingStoryAnalytics) {
                 DebugAnalyticsView(contentType: .story)
                     .environmentObject(dataService)
+            }
+        }
+    }
+    
+    private func refreshProfileFromAPI() {
+        isLoadingProfile = true
+        
+        Task {
+            // Simulate fetching profile from Instagram API
+            let result = await mockAPI.getUserProfile()
+            
+            await MainActor.run {
+                isLoadingProfile = false
+                
+                switch result {
+                case .success(let profileData):
+                    print("📊 Dashboard: Fetched profile data from API")
+                    if let username = profileData["username"] as? String {
+                        print("📊 Dashboard: Profile username: \(username)")
+                    }
+                case .failure(let error):
+                    print("📊 Dashboard: Failed to fetch profile: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -1275,6 +1306,60 @@ struct EngagementBreakdownView: View {
         .padding()
         .background(Color.antarButton)
         .cornerRadius(12)
+    }
+}
+
+// MARK: - Dashboard API Demo Section
+
+struct DashboardAPIDemoSection: View {
+    @Binding var isLoadingProfile: Bool
+    let onRefreshProfile: () -> Void
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("API Demo")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.secondary)
+                
+                Text("Refresh profile from Instagram API")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Button(action: onRefreshProfile) {
+                HStack(spacing: 6) {
+                    if isLoadingProfile {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "person.circle")
+                    }
+                    Text(isLoadingProfile ? "Loading..." : "Get Profile")
+                        .font(.caption)
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    LinearGradient(
+                        colors: [.blue, .purple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(8)
+            }
+            .disabled(isLoadingProfile)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color.antarButton.opacity(0.5))
+        .cornerRadius(8)
     }
 }
 

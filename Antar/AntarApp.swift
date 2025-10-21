@@ -10,12 +10,14 @@ import SwiftUI
 @main
 struct AntarApp: App {
     @StateObject private var dataService = DataService.shared
+    @StateObject private var mockDataService = MockDataService.shared
     @StateObject private var backgroundSync = BackgroundSyncService.shared
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(dataService)
+                .environmentObject(mockDataService)
                 .environmentObject(backgroundSync)
                 .onOpenURL { url in
                     // Handle Instagram OAuth callback
