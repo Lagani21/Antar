@@ -10,43 +10,45 @@
 
 ---
 
-## 🎯 About Antar
+
+
+##  About Antar
 
 Antar is a comprehensive Instagram management application built with SwiftUI for iOS. Manage multiple Instagram accounts, schedule posts, analyze performance, and engage with your audience—all from one beautiful interface.
 
-## ✨ Features
+##  Features
 
-### 📊 Dashboard
+###  Dashboard
 - Real-time analytics overview
 - Performance metrics
 - Engagement tracking
 - Content insights
 
-### 📅 Content Calendar
+###  Content Calendar
 - Visual post scheduling
 - Drag-and-drop organization
 - Multi-account support
 - Timeline view
 
-### ✍️ Post Composer
+###  Post Composer
 - Create posts, reels, and stories
 - Caption editor with hashtag suggestions
 - Image/video upload
 - Schedule for optimal times
 
-### 📈 Analytics
+###  Analytics
 - Detailed post performance
 - Follower growth tracking
 - Engagement metrics
 - Reach and impressions
 - Historical data visualization
 
-### 📝 Drafts
+###  Drafts
 - Save work in progress
 - Edit and refine content
 - Schedule later
 
-### ⚙️ Settings
+###  Settings
 - **Multiple account support**
 - **Account switching**
 - **Instagram OAuth integration**
