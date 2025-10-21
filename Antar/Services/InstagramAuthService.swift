@@ -30,6 +30,7 @@ class InstagramAuthService: NSObject, ObservableObject {
         case invalidResponse
         case networkError(String)
         case cancelled
+        case notConfigured
         
         var errorDescription: String? {
             switch self {
@@ -43,6 +44,8 @@ class InstagramAuthService: NSObject, ObservableObject {
                 return "Network error: \(message)"
             case .cancelled:
                 return "Authentication was cancelled"
+            case .notConfigured:
+                return "Instagram API credentials not configured. Please set up your Instagram App credentials."
             }
         }
     }
@@ -51,6 +54,12 @@ class InstagramAuthService: NSObject, ObservableObject {
     
     /// Start Instagram OAuth flow
     func authenticate(completion: @escaping (Result<InstagramAccount, Error>) -> Void) {
+        // Check if API credentials are configured
+        guard InstagramAPIConfig.isConfigured else {
+            completion(.failure(AuthError.notConfigured))
+            return
+        }
+        
         // Generate random state for CSRF protection
         let state = UUID().uuidString
         currentState = state

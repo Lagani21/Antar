@@ -12,6 +12,7 @@ struct SettingsView: View {
     @StateObject private var authService = InstagramAuthService.shared
     @StateObject private var apiService = InstagramAPIService.shared
     @StateObject private var followerAnalytics = FollowerAnalyticsService.shared
+    @StateObject private var apiLogger = APIRequestLogger.shared
     
     @State private var isSwitching = false
     @State private var showError = false
@@ -51,6 +52,80 @@ struct SettingsView: View {
                         }
                     }
                     .disabled(authService.isAuthenticating)
+                }
+                .listRowBackground(Color.antarButton)
+                
+                // Configuration Status
+                Section("API Configuration") {
+                    HStack {
+                        Image(systemName: InstagramAPIConfig.isConfigured ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundColor(InstagramAPIConfig.isConfigured ? .green : .orange)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(InstagramAPIConfig.isConfigured ? "Instagram API Configured" : "Instagram API Not Configured")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            
+                            if !InstagramAPIConfig.isConfigured {
+                                Text("Set up your Instagram App credentials to enable real data")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        if !InstagramAPIConfig.isConfigured {
+                            NavigationLink(destination: InstagramSetupGuideView()) {
+                                Text("Setup Guide")
+                                    .font(.caption)
+                                    .foregroundColor(.antarDark)
+                            }
+                        }
+                    }
+                }
+                .listRowBackground(Color.antarButton)
+                
+                // Developer/Demo Section
+                Section("Developer & Demo") {
+                    NavigationLink(destination: APIDebugView()) {
+                        HStack {
+                            Label("API Request Monitor", systemImage: "network")
+                            Spacer()
+                            if apiLogger.requests.count > 0 {
+                                Text("\(apiLogger.requests.count)")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.antarDark)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    
+                    Toggle(isOn: $apiLogger.isEnabled) {
+                        HStack {
+                            Image(systemName: "waveform.path.ecg")
+                                .foregroundColor(apiLogger.isEnabled ? .green : .secondary)
+                            Text("Enable API Logging")
+                        }
+                    }
+                    .tint(.antarDark)
+                    
+                    Button(action: { apiLogger.clear() }) {
+                        HStack {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                            Text("Clear API Logs")
+                                .foregroundColor(.red)
+                            Spacer()
+                            Text("\(apiLogger.requests.count) logs")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .disabled(apiLogger.requests.isEmpty)
                 }
                 .listRowBackground(Color.antarButton)
                 

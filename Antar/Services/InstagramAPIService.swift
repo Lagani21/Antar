@@ -14,6 +14,8 @@ class InstagramAPIService: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     
+    private let rateLimitService = APIRateLimitService.shared
+    
     private init() {}
     
     enum APIError: LocalizedError {
@@ -22,6 +24,7 @@ class InstagramAPIService: ObservableObject {
         case networkError(String)
         case decodingError
         case unauthorized
+        case rateLimitExceeded
         
         var errorDescription: String? {
             switch self {
@@ -35,6 +38,8 @@ class InstagramAPIService: ObservableObject {
                 return "Failed to decode response"
             case .unauthorized:
                 return "Unauthorized. Please reconnect your account."
+            case .rateLimitExceeded:
+                return "Rate limit exceeded. Please wait before making more requests."
             }
         }
     }
@@ -160,6 +165,12 @@ class InstagramAPIService: ObservableObject {
     // MARK: - Fetch User Media
     
     func fetchUserMedia(accessToken: String, completion: @escaping (Result<[InstagramMedia], Error>) -> Void) {
+        // Check rate limits before making request
+        guard rateLimitService.canMakeRequest() else {
+            completion(.failure(APIError.rateLimitExceeded))
+            return
+        }
+        
         let fields = "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count"
         let urlString = "\(InstagramAPIConfig.graphAPIBaseURL)/me/media?fields=\(fields)&access_token=\(accessToken)&limit=25"
         

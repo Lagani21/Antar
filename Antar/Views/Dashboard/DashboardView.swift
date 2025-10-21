@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @EnvironmentObject var mockDataService: MockDataService
+    @EnvironmentObject var dataService: DataService
     @State private var showingPostAnalytics = false
     @State private var showingReelAnalytics = false
     @State private var showingStoryAnalytics = false
@@ -18,12 +18,12 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     // 1. Account Name (full width)
-                    if let account = mockDataService.activeAccount {
+                    if let account = dataService.activeAccount {
                         AccountNameCard(account: account)
                     }
                     
                     // 2. Followers & Following buttons
-                    FollowButtonsView(account: mockDataService.activeAccount)
+                    FollowButtonsView(account: dataService.activeAccount)
                     
                     // 3. Content Type Analytics buttons
                     ContentAnalyticsButtonsView(
@@ -42,15 +42,15 @@ struct DashboardView: View {
         .background(Color.antarBase)
             .sheet(isPresented: $showingPostAnalytics) {
                 DebugAnalyticsView(contentType: .post)
-                    .environmentObject(mockDataService)
+                    .environmentObject(dataService)
             }
             .sheet(isPresented: $showingReelAnalytics) {
                 DebugAnalyticsView(contentType: .reel)
-                    .environmentObject(mockDataService)
+                    .environmentObject(dataService)
             }
             .sheet(isPresented: $showingStoryAnalytics) {
                 DebugAnalyticsView(contentType: .story)
-                    .environmentObject(mockDataService)
+                    .environmentObject(dataService)
             }
         }
     }
@@ -117,23 +117,23 @@ struct FollowButtonsView: View {
             if let account = account {
                 NavigationLink(destination: FollowerAnalyticsView(account: account)) {
                     FollowButtonContent(
-                        title: "Followers",
+                title: "Followers",
                         count: account.followersCount,
                         growth: growth,
-                        icon: "person.2.fill",
-                        color: .antarDark
-                    )
+                icon: "person.2.fill",
+                color: .antarDark
+            )
                 }
                 .buttonStyle(PlainButtonStyle())
-                
+            
                 NavigationLink(destination: FollowerAnalyticsView(account: account)) {
                     FollowButtonContent(
-                        title: "Following",
+                title: "Following",
                         count: account.followingCount,
                         growth: 0, // Following doesn't typically show growth
-                        icon: "person.fill",
-                        color: .antarAccent2
-                    )
+                icon: "person.fill",
+                color: .antarAccent2
+            )
                 }
                 .buttonStyle(PlainButtonStyle())
             }
@@ -157,16 +157,16 @@ struct FollowButtonContent: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Text(formatNumber(count))
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-            
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(color)
+                
+                Text(formatNumber(count))
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
             // Always show growth section to maintain consistent height
             HStack(spacing: 4) {
                 if growth != 0 {
@@ -188,16 +188,16 @@ struct FollowButtonContent: View {
             }
             .foregroundColor(growth > 0 ? .green : (growth < 0 ? .red : .clear))
             
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(Color.antarButton)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .background(Color.antarButton)
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-    }
 }
 
 // MARK: - Follower Growth Chart
@@ -448,7 +448,7 @@ struct ContentAnalyticsButton: View {
 
 // MARK: - Recent Activity
 struct RecentActivityView: View {
-    @EnvironmentObject var mockDataService: MockDataService
+    @EnvironmentObject var dataService: DataService
     @State private var activities: [ActivityItem] = []
     
     var body: some View {
@@ -572,12 +572,12 @@ func formatNumber(_ number: Int) -> String {
 // MARK: - Full Analytics View
 struct DebugAnalyticsView: View {
     let contentType: ContentType
-    @EnvironmentObject var mockDataService: MockDataService
+    @EnvironmentObject var dataService: DataService
     @Environment(\.dismiss) var dismiss
     @State private var selectedPost: MockPost? = nil
     
     var filteredPosts: [MockPost] {
-        mockDataService.publishedPosts.filter { $0.contentType == contentType }
+        dataService.posts.filter { $0.contentType == contentType }
     }
     
     var averageStats: (impressions: Int, likes: Int, comments: Int, shares: Int) {
@@ -611,27 +611,27 @@ struct DebugAnalyticsView: View {
                                 .fontWeight(.semibold)
                             
                             // Average Metrics Cards - Only Likes, Comments, Shares in one row
-                            HStack(spacing: 12) {
-                                AverageMetricCard(
-                                    title: "Avg Likes",
-                                    value: formatNumber(averageStats.likes),
-                                    icon: "heart.fill",
-                                    color: .antarAccent1
-                                )
+                                HStack(spacing: 12) {
+                                    AverageMetricCard(
+                                        title: "Avg Likes",
+                                        value: formatNumber(averageStats.likes),
+                                        icon: "heart.fill",
+                                        color: .antarAccent1
+                                    )
+                                    
+                                    AverageMetricCard(
+                                        title: "Avg Comments",
+                                        value: formatNumber(averageStats.comments),
+                                        icon: "message.fill",
+                                        color: .antarAccent2
+                                    )
                                 
-                                AverageMetricCard(
-                                    title: "Avg Comments",
-                                    value: formatNumber(averageStats.comments),
-                                    icon: "message.fill",
-                                    color: .antarAccent2
-                                )
-                                
-                                AverageMetricCard(
-                                    title: "Avg Shares",
-                                    value: formatNumber(averageStats.shares),
-                                    icon: "arrowshape.turn.up.right.fill",
-                                    color: .antarAccent3
-                                )
+                                    AverageMetricCard(
+                                        title: "Avg Shares",
+                                        value: formatNumber(averageStats.shares),
+                                        icon: "arrowshape.turn.up.right.fill",
+                                        color: .antarAccent3
+                                    )
                             }
                         }
                         .padding()
@@ -731,7 +731,7 @@ struct DebugAnalyticsView: View {
             }
             .sheet(item: $selectedPost) { post in
                 DetailedAnalyticsView(post: post, contentType: contentType)
-                    .environmentObject(mockDataService)
+                    .environmentObject(dataService)
             }
         }
     }

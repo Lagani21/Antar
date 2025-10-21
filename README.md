@@ -100,13 +100,7 @@ cd antar
 
 ### 2. Configure Instagram Integration
 
-Follow the step-by-step guide:
-
-📖 **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Complete setup checklist
-
-Or quick setup:
-
-📖 **[QUICK_START.md](QUICK_START.md)** - 5-minute setup guide
+📖 **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Complete setup guide with both real API and mock API options
 
 ### 3. Run the App
 
@@ -118,18 +112,14 @@ open Antar.xcodeproj
 
 ## 📚 Documentation
 
-### Setup & Configuration
-- **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Step-by-step setup checklist
-- **[QUICK_START.md](QUICK_START.md)** - Quick setup guide (5 min)
-- **[INSTAGRAM_SETUP_GUIDE.md](INSTAGRAM_SETUP_GUIDE.md)** - Comprehensive setup guide
-
-### Technical Documentation
-- **[INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md)** - Technical implementation details
-- **[Info.plist.template](Info.plist.template)** - Required iOS configuration
+### Setup & Testing
+- **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Complete setup guide (real API + mock API demo)
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Comprehensive testing guide
 
 ### Configuration Files
 - **`InstagramAPIConfig.swift`** - API credentials and endpoints
 - **`InstagramAPIConfig.example.swift`** - Template for credentials
+- **[Info.plist.template](Info.plist.template)** - Required iOS configuration
 
 ## 🔐 Security
 
@@ -205,19 +195,20 @@ Antar/
 
 ## 🧪 Testing
 
-### Mock Data
-The app includes a comprehensive mock data system:
-- Sample accounts
-- Sample posts, reels, stories
-- Sample analytics data
+### Mock API Demo
+The app includes a comprehensive **Mock Instagram Graph API** system:
+- Simulates all Instagram API endpoints
+- Real-time request/response logging
+- Perfect for portfolio demonstrations
+- No credentials required!
 
-Perfect for development without API calls.
-
-### Real Data
-Once configured, the app fetches real data from Instagram:
+### Real API Integration
+Once configured, the app connects to real Instagram:
 - Live account information
 - Actual posts and media
 - Real-time insights
+
+📖 **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Complete testing guide
 
 ## 🔄 Development Workflow
 
@@ -283,9 +274,8 @@ This project is licensed under the MIT License - see LICENSE file for details.
 ## 📞 Support
 
 ### Documentation
-- Check [QUICK_START.md](QUICK_START.md) for setup
-- Review [INSTAGRAM_SETUP_GUIDE.md](INSTAGRAM_SETUP_GUIDE.md) for details
-- See [INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md) for technical info
+- Check [SETUP_GUIDE.md](SETUP_GUIDE.md) for setup
+- Review [TESTING_GUIDE.md](TESTING_GUIDE.md) for testing
 
 ### Resources
 - [Instagram API Docs](https://developers.facebook.com/docs/instagram-api)
@@ -299,8 +289,8 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ## 🎯 Getting Started in 3 Steps
 
-1. **📖 Read**: [QUICK_START.md](QUICK_START.md)
-2. **⚙️ Configure**: Follow [SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)
+1. **📖 Read**: [SETUP_GUIDE.md](SETUP_GUIDE.md)
+2. **⚙️ Configure**: Follow the setup guide (real API or mock demo)
 3. **🚀 Run**: Open in Xcode and press Cmd+R
 
 ## 💡 Pro Tips

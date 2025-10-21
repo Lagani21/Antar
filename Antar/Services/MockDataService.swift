@@ -16,6 +16,8 @@ class MockDataService: ObservableObject {
     @Published var posts: [MockPost] = []
     @Published var activeAccount: InstagramAccount?
     
+    private let mockGraphAPI = MockInstagramGraphAPIService.shared
+    
     private init() {
         // Force regenerate data on each app launch
         generateMockData()
@@ -186,5 +188,86 @@ class MockDataService: ObservableObject {
     
     func addPost(_ post: MockPost) {
         posts.append(post)
+    }
+    
+    // MARK: - Mock Graph API Integration
+    
+    /// Publishes a post using the Mock Instagram Graph API (demonstrates API flow)
+    func publishPostWithMockAPI(imageUrl: String, caption: String, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let accountId = activeAccount?.id else {
+            completion(.failure(NSError(domain: "MockDataService", code: 1, userInfo: [NSLocalizedDescriptionKey: "No active account"])))
+            return
+        }
+        
+        Task {
+            // Use the mock Graph API to demonstrate publishing flow
+            let result = await mockGraphAPI.demonstratePublishingFlow(imageUrl: imageUrl, caption: caption)
+            
+            await MainActor.run {
+                switch result {
+                case .success(let mediaId):
+                    // Create a new published post in our local data
+                    let newPost = MockPost(
+                        caption: caption,
+                        mediaUrls: [imageUrl],
+                        status: .published,
+                        publishedTime: Date(),
+                        likesCount: 0,
+                        commentsCount: 0,
+                        sharesCount: 0,
+                        reach: 0,
+                        impressions: 0,
+                        accountId: accountId,
+                        contentType: .post
+                    )
+                    
+                    self.posts.append(newPost)
+                    completion(.success(mediaId))
+                    
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
+    /// Fetches user profile using Mock Graph API (demonstrates API flow)
+    func fetchUserProfileWithMockAPI(completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        Task {
+            let result = await mockGraphAPI.getUserProfile()
+            await MainActor.run {
+                completion(result)
+            }
+        }
+    }
+    
+    /// Fetches user media using Mock Graph API (demonstrates API flow)
+    func fetchUserMediaWithMockAPI(completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
+        Task {
+            let result = await mockGraphAPI.getUserMedia()
+            await MainActor.run {
+                completion(result)
+            }
+        }
+    }
+    
+    /// Fetches account insights using Mock Graph API (demonstrates API flow)
+    func fetchAccountInsightsWithMockAPI(completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        Task {
+            let result = await mockGraphAPI.getAccountInsights()
+            await MainActor.run {
+                completion(result)
+            }
+        }
+    }
+    
+    /// Fetches media insights using Mock Graph API (demonstrates API flow)
+    func fetchMediaInsightsWithMockAPI(mediaId: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        Task {
+            let result = await mockGraphAPI.getMediaInsights(mediaId: mediaId)
+            await MainActor.run {
+                completion(result)
+            }
+        }
     }
 }

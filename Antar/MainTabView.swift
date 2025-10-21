@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @EnvironmentObject var mockDataService: MockDataService
+    @EnvironmentObject var dataService: DataService
     @State private var selectedTab = 0
     
     var body: some View {
